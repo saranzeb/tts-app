@@ -2,6 +2,7 @@ import os
 import uuid
 import io
 import zipfile
+import base64
 from gtts import gTTS
 import streamlit as st
 
@@ -33,9 +34,22 @@ def make_zip(file_paths: list[str]) -> bytes:
     zip_buffer.seek(0)
     return zip_buffer.read()
 
+def audio_player(path):
+    """100% phone-safe audio player using Base64."""
+    with open(path, "rb") as f:
+        data = f.read()
+    b64 = base64.b64encode(data).decode()
+    audio_html = f"""
+    <audio controls style="width:100%">
+        <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+    """
+    st.markdown(audio_html, unsafe_allow_html=True)
+
 def main():
-    st.title("🇨🇳 Chinese TTS (gTTS Version)")
-    st.write("Works on Streamlit Cloud!")
+    st.title("🇨🇳 Chinese TTS (Mobile-Friendly Version)")
+    st.write("Generate Chinese audio that plays correctly on ALL phones.")
 
     text = st.text_area("Chinese Text", "你好，我是你的中文老师。")
 
@@ -51,11 +65,10 @@ def main():
 
         st.success("Generated audio successfully!")
 
-        st.subheader("Audio Preview")
+        st.subheader("Audio Preview (Phone Safe)")
         for i, path in enumerate(file_paths, 1):
-            with open(path, "rb") as f:
-                st.audio(f.read(), format="audio/mp3")
-                st.caption(os.path.basename(path))
+            audio_player(path)
+            st.caption(os.path.basename(path))
 
         st.subheader("Download All as ZIP")
         zip_bytes = make_zip(file_paths)
