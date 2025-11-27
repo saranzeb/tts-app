@@ -7,10 +7,6 @@ import streamlit as st
 
 AUDIO_DIR = "audio_files"
 
-CHINESE_VOICES = [
-    "zh-cn",  # gTTS only needs one Chinese language code
-]
-
 def synth_one(text: str, filename: str):
     """Generate one MP3 file using gTTS."""
     tts = gTTS(text=text, lang="zh")
@@ -66,4 +62,9 @@ def main():
         st.download_button(
             label="Download ZIP",
             data=zip_bytes,
-            file_name="tts_outputs.zip"
+            file_name="tts_outputs.zip",
+            mime="application/zip",
+        )
+
+if __name__ == "__main__":
+    main()
